@@ -13,6 +13,7 @@ function getTotalEventsChartBuilder(){
 
 			var yAxis = this.yAxis = d3.svg.axis().scale(y).orient("left");
 
+			var chartContainer = this.chartContainer = d3.select( "#chartContainer" );
 			var chart = this.chart = d3.select(nodeSelector)
 				.attr("width", width + margin.left + margin.right)
 				.attr("height", height + margin.top + margin.bottom)
@@ -62,6 +63,27 @@ function getTotalEventsChartBuilder(){
 				.attr("y", function(d) { return y(d.value); })
 				.attr("height", function(d) { return height - y(d.value); })
 				.attr("width", x.rangeBand());
+		},
+		
+		renderTable: function( data ){
+			var colName = ["date", "type", "Platform", "Browser"];
+			var chartContainer = this.chartContainer;
+			var table = chartContainer.append("div")
+				.attr("class", "container")
+				.style("width", "100%")
+				.append("table").attr("class", "table table-striped table-condensed table-bordered");
+			table
+				.append("thead").append("tr")
+				.selectAll("th").data(colName).enter()
+				.append("th").text( function(d) {return d;});
+			
+			var trEnter = table.append("tbody").selectAll("tr")
+				.data(data).enter().append("tr");
+			
+			trEnter.append("td").text( function(d) {return d.doc.date} )
+			trEnter.append("td").text( function(d) {return d.doc.type} )
+			trEnter.append("td").text( function(d) {return d.doc.uap} )
+			trEnter.append("td").text( function(d) {return d.doc.uab} )
 		}
 	};
 }

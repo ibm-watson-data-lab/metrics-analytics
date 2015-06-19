@@ -35,22 +35,32 @@
 				<div class="col-md-2">
 				</div>
 				<div class="col-md-8">
-					<span class="dropdown">
-						<button class="btn btn-default dropdown-toggle" type="button" id="visualizationsMenu" data-toggle="dropdown">
-							{{selectedVisualization.name}} <span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu">
-							<li ng-repeat="visualization in visualizations"	ng-click="selectVisualization(visualization)">
-								<a href="#">{{visualization.name}}</a>
-							</li>
-						</ul>
+					<span class="btn-toolbar" role="toolbar">
+						<span class="dropdown" style="margin-left:20px">
+							<button class="btn btn-default dropdown-toggle" type="button" id="visualizationsMenu" data-toggle="dropdown">
+								{{selectedVisualization.name}} <span class="caret"></span>
+							</button>
+							<ul class="dropdown-menu">
+								<li ng-repeat="visualization in visualizations"	ng-click="selectVisualization(visualization)">
+									<a href="#">{{visualization.name}}</a>
+								</li>
+							</ul>
+						</span>
+						
+						<div class="btn-group btn-group-lg" data-toggle="buttons" role="group">
+							<button type="button" ng-class="['btn', 'btn-default', (presentationStyle=='chart' ? 'active': '')]" ng-click="togglePresentation( 'chart' )">
+								<span class="glyphicon glyphicon-stats"></span>
+							</button>
+  							<button type="button" ng-class="['btn', 'btn-default', (presentationStyle=='table' ? 'active': '')]" ng-click="togglePresentation( 'table' )">
+  								<span class="glyphicon glyphicon-list-alt"></span>
+  							</button>
+						</div>		
+						
+						<span id="reportrange" class="pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+	    					<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+	    					<span></span> <b class="caret"></b>
+						</span>
 					</span>
-					
-					<span id="reportrange" class="pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
-    					<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
-    					<span></span> <b class="caret"></b>
-					</span>
-					
 				</div>
 				<div class="col-md-2"></div>
 			</div>
@@ -73,6 +83,7 @@
 				<div class="col-md-8">
 					<div class="well text-center">
 						<svg class="chart" id="chart"></svg>
+						<div id="chartContainer"/>
 					</div>
 				</div>
 				<div class="col-md-2">

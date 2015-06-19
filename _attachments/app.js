@@ -10,6 +10,7 @@ var mainApp = angular.module('visualizationApp', [
 .controller('vizModel', ['$scope', '$http', '$location',
   function($scope, $http, $location) {
 	
+	$scope.presentationStyle = "chart";
 	var startDateFilter = null;
 	var endDateFilter = null;
 	
@@ -53,7 +54,8 @@ var mainApp = angular.module('visualizationApp', [
 	$scope.selectVisualization = function(visualization){
 		
 		//Reset node
-		d3.select("#chart").html("");
+		d3.select("#chart").html("").style("display","none");
+		d3.select("#chartContainer").html("").style("display", "none");
 		
 		$scope.selectedVisualization = visualization || $scope.selectedVisualization;
 		
@@ -75,12 +77,21 @@ var mainApp = angular.module('visualizationApp', [
 			//Render now
 			var builder = $scope.selectedVisualization.builder;
 	    	builder.init( "#chart", $scope.selectedVisualization );
-	    	couchApp.db.view( design + "/" + $scope.selectedVisualization.view,{
-	      		group:true,
+	    	var istable = $scope.presentationStyle == "table";
+	    	var viewName = (istable ? "all_events_table" : $scope.selectedVisualization.view );
+	    	couchApp.db.view( design + "/" + viewName,{
+	      		group:!istable,
+	      		include_docs: istable,
 	      		startkey:getLookupKey( startDateFilter, 0 ),
 	      		endkey: getLookupKey( endDateFilter, {} ),
 	        	success: function( data ){
-	        		builder.renderChart( data.rows );
+	        		if ( !istable ){
+	        			d3.select("#chart").style("display","");
+	        			builder.renderChart( data.rows );
+	        		}else{
+	        			d3.select("#chartContainer").style("display", "");
+	        			builder.renderTable( data.rows );
+	        		}
 	        	},
 	        	error: function( status, errMessage ){
 	        		console.log( "error: " + errMessage );
@@ -114,6 +125,13 @@ var mainApp = angular.module('visualizationApp', [
 	$scope.selectApp = function(app){
 		if ( $scope.selectedApp != app ){
 			$scope.selectedApp = app;
+			$scope.selectVisualization();
+		}
+	}
+	
+	$scope.togglePresentation = function( style ){
+		if ( $scope.presentationStyle != style ){
+			$scope.presentationStyle = style;
 			$scope.selectVisualization();
 		}
 	}
