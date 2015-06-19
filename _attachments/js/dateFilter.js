@@ -1,11 +1,13 @@
+var initStartDate = moment().subtract(29, 'days');
+var initEndDate = moment();
 function configureDateFilter( callback ){
  
     $('#reportrange span').html(moment().subtract(29, 'days').format('MMMM D, YYYY') + ' - ' + moment().format('MMMM D, YYYY'));
  
     $('#reportrange').daterangepicker({
         format: 'MM/DD/YYYY',
-        startDate: moment().subtract(29, 'days'),
-        endDate: moment(),
+        startDate: initStartDate,
+        endDate: initEndDate,
         minDate: '01/01/2012',
         maxDate: '12/31/2015',
         dateLimit: { days: 60 },

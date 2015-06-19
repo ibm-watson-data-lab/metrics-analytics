@@ -32,7 +32,7 @@ function getTotalEventsChartBuilder(){
 			x.domain( 
 				data.map(
 					function(d) {
-						return d.key[1]; 
+						return d.key[4]; 
 					}
 				)
 			);
@@ -58,7 +58,7 @@ function getTotalEventsChartBuilder(){
 				.data(data)
 				.enter().append("rect")
 				.attr("class", "bar")
-				.attr("x", function(d) { return x(d.key[1]); })
+				.attr("x", function(d) { return x(d.key[4]); })
 				.attr("y", function(d) { return y(d.value); })
 				.attr("height", function(d) { return height - y(d.value); })
 				.attr("width", x.rangeBand());

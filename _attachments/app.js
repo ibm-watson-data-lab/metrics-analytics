@@ -12,9 +12,15 @@ var mainApp = angular.module('visualizationApp', [
 	
 	var startDateFilter = null;
 	var endDateFilter = null;
-	configureDateFilter( function( start, end, label ){
+	
+	function updateDates( start, end ){
 		startDateFilter = start.format('YYYY-MM-DD');
-		startDateFilter = end.format('YYYY-MM-DD');
+		endDateFilter = end.format('YYYY-MM-DD');
+	}
+	
+	updateDates( initStartDate, initEndDate );
+	configureDateFilter( function( start, end, label ){
+		updateDates( start, end );
 		$scope.selectVisualization();
 	});
 	
@@ -56,14 +62,23 @@ var mainApp = angular.module('visualizationApp', [
 			return;
 		}
 		
+		function getLookupKey( date, wildcard ){
+			var ar = date ? date.split("-") : [];
+			if ( ar.length == 3 ){
+				return [Number(ar[0]), Number(ar[1]), Number(ar[2]), $scope.selectedApp.key, wildcard];
+			}else{
+				return [0, 0, 0, $scope.selectedApp.key, wildcard];
+			}
+		}
+		
 		if ( $scope.selectedVisualization ){
 			//Render now
 			var builder = $scope.selectedVisualization.builder;
 	    	builder.init( "#chart", $scope.selectedVisualization );
 	    	couchApp.db.view( design + "/" + $scope.selectedVisualization.view,{
 	      		group:true,
-	      		startkey:[$scope.selectedApp.key, 0, startDateFilter || 0 ],
-	      		endkey:[$scope.selectedApp.key, {}, endDateFilter || {}],
+	      		startkey:getLookupKey( startDateFilter, 0 ),
+	      		endkey: getLookupKey( endDateFilter, {} ),
 	        	success: function( data ){
 	        		builder.renderChart( data.rows );
 	        	},
