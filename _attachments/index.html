@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html ng-app="visualizationApp">
+  <head>
+    <title>Tracker Events Visualization CouchApp</title>
+    <script src="vendor/couchapp/angular.min.js"></script>
+    <script src="vendor/couchapp/jquery.min.js"></script>
+    <script src="vendor/couchapp/bootstrap.js"></script>
+    <script src="vendor/couchapp/ui-bootstrap-tpls-0.12.1.js"></script>
+    
+    <script src="vendor/couchapp/jquery.couch.js"></script>
+  	<script src="vendor/couchapp/jquery.couch.app.js"></script>
+  	<script src="vendor/couchapp/jquery.couch.app.util.js"></script>
+    
+    <script src="vendor/couchapp/d3.min.js"></script>
+    <script src="vendor/couchapp/moment.min.js"></script>
+    <script src="vendor/couchapp/daterangepicker.js"></script>
+    <script src="app.js"></script>
+    <script src="charts/chartTotalEvents.js"></script>
+    <script src="js/dateFilter.js"></script>
+    <link rel="stylesheet" href="style/main.css" type="text/css">
+    <link rel="stylesheet" href="style/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="style/font-awesome.min.css" type="text/css"/>
+    <link rel="stylesheet" href="style/daterangepicker-bs3.css" type="text/css"/>
+
+</head>
+  	<body>
+		<nav class="navbar navbar-default navbar-fixed-top">
+		  <div class="container text-center">
+		    <h3><span class="label label-default">Tracker metrics Visualization sample app</span></h3>
+		  </div>
+		</nav>
+	
+		<div class="container-fluid" style="margin-top:60px" ng-controller="vizModel">
+			<div class="row">
+				<div class="col-md-2">
+				</div>
+				<div class="col-md-8">
+					<span class="dropdown">
+						<button class="btn btn-default dropdown-toggle" type="button" id="visualizationsMenu" data-toggle="dropdown">
+							{{selectedVisualization.name}} <span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu">
+							<li ng-repeat="visualization in visualizations"	ng-click="selectVisualization(visualization)">
+								<a href="#">{{visualization.name}}</a>
+							</li>
+						</ul>
+					</span>
+					
+					<span id="reportrange" class="pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+    					<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+    					<span></span> <b class="caret"></b>
+					</span>
+					
+				</div>
+				<div class="col-md-2"></div>
+			</div>
+			<div class="row">
+				<div class="col-md-2">
+					<div class="input-group">
+	  					<span class="input-group-addon glyphicon glyphicon-search"></span>
+	  					<input type="search" ng-model="query" class="form-control" placeholder="Application id">
+					</div>
+					<p>
+					<ul class="nav nav-pills nav-stacked">
+						<li ng-repeat="app in apps|filter:query as results" ng-class="selectedClass(app)" ng-click="selectApp(app)">
+							<a href="#"> {{app.key}} <span class="badge">{{app.value}}</span></a>
+						</li>
+						<li class="animate-repeat" ng-if="results.length == 0">
+	     					<strong>No results match the query</strong>
+	    				</li>
+					</ul>
+				</div>
+				<div class="col-md-8">
+					<div class="well text-center">
+						<svg class="chart" id="chart"></svg>
+					</div>
+				</div>
+				<div class="col-md-2">
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
