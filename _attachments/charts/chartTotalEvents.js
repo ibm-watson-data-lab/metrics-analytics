@@ -66,7 +66,7 @@ function getTotalEventsChartBuilder(){
 		},
 		
 		renderTable: function( data ){
-			var colName = ["date", "type", "Platform", "Browser"];
+			var colName = ["date", "type", "ip", "Platform", "Browser"];
 			var chartContainer = this.chartContainer;
 			var table = chartContainer.append("div")
 				.attr("class", "container")
@@ -82,6 +82,7 @@ function getTotalEventsChartBuilder(){
 			
 			trEnter.append("td").text( function(d) {return d.doc.date} )
 			trEnter.append("td").text( function(d) {return d.doc.type} )
+			trEnter.append("td").text( function(d) {return d.doc.ip} )
 			trEnter.append("td").text( function(d) {return d.doc.uap} )
 			trEnter.append("td").text( function(d) {return d.doc.uab} )
 		}

@@ -67,7 +67,7 @@ var mainApp = angular.module('visualizationApp', [
 		function getLookupKey( date, wildcard ){
 			var ar = date ? date.split("-") : [];
 			if ( ar.length == 3 ){
-				return [Number(ar[0]), Number(ar[1]), Number(ar[2]), $scope.selectedApp.key, wildcard];
+				return [$scope.selectedApp.key, Number(ar[0]), Number(ar[1]), Number(ar[2]), wildcard];
 			}else{
 				return [0, 0, 0, $scope.selectedApp.key, wildcard];
 			}
