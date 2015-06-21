@@ -19,6 +19,7 @@
     <script src="js/dateFilter.js"></script>
     <link rel="stylesheet" href="style/main.css" type="text/css">
     <link rel="stylesheet" href="style/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="style/bootstrap.icon-large.min.css" type="text/css"/>
     <link rel="stylesheet" href="style/font-awesome.min.css" type="text/css"/>
     <link rel="stylesheet" href="style/daterangepicker-bs3.css" type="text/css"/>
 
@@ -49,10 +50,13 @@
 						
 						<div class="btn-group btn-group-lg" data-toggle="buttons" role="group">
 							<button type="button" ng-class="['btn', 'btn-default', (presentationStyle=='chart' ? 'active': '')]" ng-click="togglePresentation( 'chart' )">
-								<span class="glyphicon glyphicon-stats"></span>
+								<i class="icon-large icon-charts"></i>
+							</button>
+							<button type="button" ng-class="['btn', 'btn-default', (presentationStyle=='line' ? 'active': '')]" ng-click="togglePresentation( 'line' )">
+								<i class="icon-large icon-stats"></i>
 							</button>
   							<button type="button" ng-class="['btn', 'btn-default', (presentationStyle=='table' ? 'active': '')]" ng-click="togglePresentation( 'table' )">
-  								<span class="glyphicon glyphicon-list-alt"></span>
+  								<i class="icon-large icon-table"></i>
   							</button>
 						</div>		
 						

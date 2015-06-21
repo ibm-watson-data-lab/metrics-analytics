@@ -76,18 +76,26 @@ var mainApp = angular.module('visualizationApp', [
 		if ( $scope.selectedVisualization ){
 			//Render now
 			var builder = $scope.selectedVisualization.builder;
-	    	builder.init( "#chart", $scope.selectedVisualization );
+	    	var customOptions = builder.init( {
+	    		selector: "#chart", 
+	    		visualization: $scope.selectedVisualization,
+	    		presentationStyle: $scope.presentationStyle
+	    	});
 	    	var istable = $scope.presentationStyle == "table";
 	    	var viewName = (istable ? "all_events_table" : $scope.selectedVisualization.view );
-	    	couchApp.db.view( design + "/" + viewName,{
-	      		group:!istable,
-	      		include_docs: istable,
-	      		startkey:getLookupKey( startDateFilter, 0 ),
+	    	var options = {
+    			startkey:getLookupKey( startDateFilter, 0 ),
 	      		endkey: getLookupKey( endDateFilter, {} ),
 	        	success: function( data ){
 	        		if ( !istable ){
 	        			d3.select("#chart").style("display","");
-	        			builder.renderChart( data.rows );
+	        			if ( $scope.presentationStyle == "chart" ){
+	        				builder.renderChart( data.rows );
+	        			}else{
+	        				if ( builder.renderLine ){
+	        					builder.renderLine( data.rows );
+	        				}
+	        			}
 	        		}else{
 	        			d3.select("#chartContainer").style("display", "");
 	        			builder.renderTable( data.rows );
@@ -96,7 +104,9 @@ var mainApp = angular.module('visualizationApp', [
 	        	error: function( status, errMessage ){
 	        		console.log( "error: " + errMessage );
 	        	}
-	    	 });
+	    	};
+	    	angular.extend( options, customOptions || {} );
+	    	couchApp.db.view( design + "/" + viewName,options);
 		}
 	}
 	
