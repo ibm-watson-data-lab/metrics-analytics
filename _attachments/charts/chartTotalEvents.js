@@ -6,6 +6,13 @@ function getTotalEventsChartBuilder(){
 			var visualization = params.visualization;
 			var presentationStyle = params.presentationStyle;
 			
+			//Remember which series the user wants to enable/disable
+			this.$scope.userSeriesSelections = this.$scope.userSeriesSelections || {};
+			this.$scope.disableSerie = function(serie){
+				this.$scope.userSeriesSelections[serie] = !this.$scope.userSeriesSelections[serie];
+				this.$scope.selectVisualization();
+			}.bind(this);
+			
 			var margin = this.margin = {top: 20, right: 30, bottom: 130, left: 40};
 			var width = this.width = (visualization.width || 500) - margin.left - margin.right;
 			var height = this.height = (visualization.height || 500) - margin.top - margin.bottom;
@@ -30,6 +37,34 @@ function getTotalEventsChartBuilder(){
 			}
 		},
 		
+		generateCustomHTML : function(){
+			var customHTML = "<div class='control-group'>" +
+				"<div class='controls span2'>";
+	
+			for ( var key in this.uniqValues ){
+				customHTML += "<label class='checkbox'>" +
+						"<input type='checkbox' value='option1' " + (this.$scope.userSeriesSelections[key] ? "checked" : "" )+ " ng-click='disableSerie(\"" + key + "\")'>" +
+						key + "</label>";
+			}
+		
+			customHTML += "</div></div>";
+			return customHTML;
+		},
+		
+		applyUserSelections: function( data ){
+			var uniqValues = this.uniqValues = {};
+			return data.filter( function(d){
+				var v = d.key[4];
+				uniqValues[v] = true;
+				if ( this.$scope.userSeriesSelections.hasOwnProperty(v) ){
+					return this.$scope.userSeriesSelections[v];
+				}else{
+					this.$scope.userSeriesSelections[v] = true;
+				}
+				return true;
+			}.bind(this));
+		},
+		
 		renderChart: function( data ){
 			var x = this.x;
 			var y = this.y;
@@ -39,14 +74,19 @@ function getTotalEventsChartBuilder(){
 			var height = this.height;
 			var xAxis = this.xAxis;
 			var yAxis = this.yAxis;
-			x.domain( 
-				data.map(
+			var $scope = this.$scope;
+			
+			var domainValues = data.map(
 					function(d) {
 						return d.key[4]; 
 					}
-				)
+				);
+			x.domain( domainValues );
+			y.domain([0, d3.max(data, function(d) { 
+							return d.value; 
+						 })
+				     ]
 			);
-			y.domain([0, d3.max(data, function(d) { return d.value; })]);
 
 			chart.append("g")
 				.attr("class", "x axis")
