@@ -49,7 +49,7 @@ var mainApp = angular.module('visualizationApp', [
 	//Contains all the supported visualization
 	$scope.visualizations=[
 	    {name:"By Events - total", view: "grouped_events", builder: getTotalEventsChartBuilder() },
-	    {name:"By Search Category", view: "search_by_categories", builder: getTotalEventsChartBuilder(), width: 1100, height: 700 }
+	    {name:"By Search Category", view: "search_by_categories", builder: getTotalEventsChartBuilder() }
 	];
 	
 	$scope.selectedVisualization=$scope.visualizations[0];
@@ -99,13 +99,21 @@ var mainApp = angular.module('visualizationApp', [
 	        			data = data.rows;
 	        		}
 	        		
+	        		if ( data.length == 0 ){
+	    				return;
+	    			}
 	        		
 	        		if ( !istable ){
 	        			d3.select("#chart").style("display","");
 	        			var customHTML = null;
 	        			if ( $scope.presentationStyle == "chart" ){
 	        				customHTML = builder.renderChart( data );
-	        			}else{
+	        			}else if ( $scope.presentationStyle == "pie" ){
+	        				if ( builder.renderPie ){
+	        					customHTML = builder.renderPie( data );
+	        				}
+	        			}
+	        			else{
 	        				if ( builder.renderLine ){
 	        					customHTML = builder.renderLine( data );
 	        				}

@@ -8,14 +8,20 @@ function getTotalEventsChartBuilder(){
 			
 			//Remember which series the user wants to enable/disable
 			this.$scope.userSeriesSelections = this.$scope.userSeriesSelections || {};
-			this.$scope.disableSerie = function(serie){
-				this.$scope.userSeriesSelections[serie] = !this.$scope.userSeriesSelections[serie];
+			this.$scope.toggleSerieSelection = function(serie){
+				this.$scope.userSeriesSelections[serie].selected = !this.$scope.userSeriesSelections[serie].selected;
 				this.$scope.selectVisualization();
 			}.bind(this);
 			
 			var margin = this.margin = {top: 20, right: 30, bottom: 130, left: 40};
-			var width = this.width = (visualization.width || 500) - margin.left - margin.right;
-			var height = this.height = (visualization.height || 500) - margin.top - margin.bottom;
+			var w = 500;
+			var h = 500;
+			if ( params.presentationStyle == "chart"){
+				w = 1100;
+				ht = 500;
+			}
+			var width = this.width = w - margin.left - margin.right;
+			var height = this.height = h - margin.top - margin.bottom;
 
 			var x = this.x = d3.scale.ordinal().rangeRoundBands([0, width], .1);
 			var y = this.y = d3.scale.linear().range([height, 0]);
@@ -37,13 +43,46 @@ function getTotalEventsChartBuilder(){
 			}
 		},
 		
+		randomColor : function(){
+			var golden_ratio_conjugate = 0.618033988749895;
+			var h = Math.random();
+
+			var hslToRgb = function (h, s, l){
+				var r, g, b;
+				if(s == 0){
+					r = g = b = l; // achromatic
+				}else{
+					function hue2rgb(p, q, t){
+						if(t < 0) t += 1;
+						if(t > 1) t -= 1;
+						if(t < 1/6) return p + (q - p) * 6 * t;
+						if(t < 1/2) return q;
+						if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+						return p;
+					}
+
+					var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+					var p = 2 * l - q;
+					r = hue2rgb(p, q, h + 1/3);
+					g = hue2rgb(p, q, h);
+					b = hue2rgb(p, q, h - 1/3);
+				}
+				return '#'+Math.round(r * 255).toString(16)+Math.round(g * 255).toString(16)+Math.round(b * 255).toString(16);
+			};
+
+
+			h += golden_ratio_conjugate;
+			h %= 1;
+			return hslToRgb(h, 0.5, 0.60);
+		},
+		
 		generateCustomHTML : function(){
 			var customHTML = "<div class='control-group'>" +
 				"<div class='controls span2'>";
 	
 			for ( var key in this.uniqValues ){
 				customHTML += "<label class='checkbox'>" +
-						"<input type='checkbox' value='option1' " + (this.$scope.userSeriesSelections[key] ? "checked" : "" )+ " ng-click='disableSerie(\"" + key + "\")'>" +
+						"<input type='checkbox' value='option1' " + (this.$scope.userSeriesSelections[key].selected ? "checked" : "" )+ " ng-click='toggleSerieSelection(\"" + key + "\")'>" +
 						key + "</label>";
 			}
 		
@@ -57,9 +96,9 @@ function getTotalEventsChartBuilder(){
 				var v = d.key[4];
 				uniqValues[v] = true;
 				if ( this.$scope.userSeriesSelections.hasOwnProperty(v) ){
-					return this.$scope.userSeriesSelections[v];
+					return this.$scope.userSeriesSelections[v].selected;
 				}else{
-					this.$scope.userSeriesSelections[v] = true;
+					this.$scope.userSeriesSelections[v] = {selected:true};
 				}
 				return true;
 			}.bind(this));
@@ -75,10 +114,27 @@ function getTotalEventsChartBuilder(){
 			var xAxis = this.xAxis;
 			var yAxis = this.yAxis;
 			var $scope = this.$scope;
+
+			//Prep the data
+			var nested = d3.nest().key(
+					function(d){
+						return d.key[4];
+					}
+				).entries(data);
+			
+			nested.forEach( function(d){
+				d.value = 0;
+				d.values.forEach( function(f){ 
+					d.value += f.value;
+				});
+				delete d.values;	//don't need it anymore
+			});
+			
+			data = nested;
 			
 			var domainValues = data.map(
 					function(d) {
-						return d.key[4]; 
+						return d.key; 
 					}
 				);
 			x.domain( domainValues );
@@ -108,7 +164,7 @@ function getTotalEventsChartBuilder(){
 				.data(data)
 				.enter().append("rect")
 				.attr("class", "bar")
-				.attr("x", function(d) { return x(d.key[4]); })
+				.attr("x", function(d) { return x(d.key); })
 				.attr("y", function(d) { return y(d.value); })
 				.attr("height", function(d) { return height - y(d.value); })
 				.attr("width", x.rangeBand());
@@ -137,11 +193,7 @@ function getTotalEventsChartBuilder(){
 			trEnter.append("td").text( function(d) {return d.doc.uab} )
 		},
 		
-		renderLine: function (data ){
-			if ( data.length == 0 ){
-				return;
-			}
-			
+		renderLine: function (data ){			
 			var x = this.x;
 			var y = this.y;
 			var xAxis = this.xAxis;
@@ -260,6 +312,121 @@ function getTotalEventsChartBuilder(){
 				.text(function(d) { 
 					return d.name; 
 				});
+		},
+		renderPie: function(data){
+			
+			//Prep the data
+			var nested = d3.nest().key(
+					function(d){
+						return d.key[4];
+					}
+				).entries(data);
+			
+			nested.forEach( function(d){
+				if ( !this.$scope.userSeriesSelections[ d.key ] ){
+					this.$scope.userSeriesSelections[ d.key ] = {selected: true};
+				}
+				if ( !this.$scope.userSeriesSelections[ d.key ].color){
+					this.$scope.userSeriesSelections[ d.key ].color = this.randomColor();
+				}
+				d.color = this.$scope.userSeriesSelections[ d.key ].color;
+				d.value = 0;
+				d.values.forEach( function(f){ 
+					d.value += f.value;
+				});
+				delete d.values;	//don't need it anymore
+			}.bind(this));
+			
+			data = nested;
+			
+			!function(){
+				var gradPie={};
+				
+				var pie = d3.layout.pie().sort(null)
+					.value(
+						function(d) {
+							return d.value;
+						}
+					);
+						
+				createGradients = function(defs, colors, r){	
+					var gradient = defs.selectAll('.gradient')
+						.data(colors).enter().append("radialGradient")
+						.attr("id", function(d,i){return "gradient" + i;})
+						.attr("gradientUnits", "userSpaceOnUse")
+						.attr("cx", "0").attr("cy", "0").attr("r", r).attr("spreadMethod", "pad");
+						
+					gradient.append("stop").attr("offset", "0%").attr("stop-color", function(d){ return d;});
+
+					gradient.append("stop").attr("offset", "30%")
+						.attr("stop-color",function(d){ return d;})
+						.attr("stop-opacity", 1);
+						
+					gradient.append("stop").attr("offset", "70%")
+						.attr("stop-color",function(d){ return "black";})
+						.attr("stop-opacity", 1);
+				}
+				
+				gradPie.draw = function(id, data, cx, cy, r){
+					var gPie = d3.select("#"+id).append("g")
+						.attr("transform", "translate(" + cx + "," + cy + ")")
+						
+					createGradients(
+						gPie.append("defs"), 
+						data.map(
+							function(d){ 
+								return d.color; 
+							}
+						), 
+						2.5*r
+					);
+
+					gPie.selectAll("path")
+						.data(pie(data))
+						.enter().append("path")
+						.attr("fill", function(d,i){ 
+								return "url(#gradient"+ i+")";
+						})
+						.attr("d", d3.svg.arc().outerRadius(r))
+						.each(
+							function(d) { 
+								this._current = d; 
+							}
+						);
+					
+					gPie.selectAll(".percent")
+						.data( pie(data) )
+						.enter().append("text")
+						.attr("class", "percent")
+						.attr("x",function(d){ 
+								return 0; //0.6 * 130 *Math.cos(0.5*(d.startAngle+d.endAngle));
+							}
+						)
+						.attr("y",function(d){ 
+								return 0; //0.6 * 100 *Math.sin(0.5*(d.startAngle+d.endAngle));
+							}
+						)
+						.text( function(d){
+							return d.data.key;
+						})
+						.attr("transform", function(d){
+							return "rotate(" + (d.endAngle - d.startAngle)*50 + ")";
+						})
+						.style("text-anchor", "end")
+						.each(
+							function(d){
+								this._current=d;
+							}
+						);		
+				}
+				
+				this.gradPie = gradPie;
+			}();
+
+			var chart = this.chart;
+			chart.append("g").attr("id","pie");
+
+			gradPie.draw("pie", data, 200, 200, 210);
 		}
 	};
 }

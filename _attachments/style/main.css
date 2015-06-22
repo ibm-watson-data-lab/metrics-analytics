@@ -24,3 +24,9 @@
   stroke: steelblue;
   stroke-width: 1.5px;
 }
+
+svg text.percent{
+	fill:white;
+	text-anchor:middle;
+	font-size:12px;
+}
