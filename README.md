@@ -1,7 +1,9 @@
 ## Metrics Analytics
 
-This project is related to the metrics-collector project ([metrics-collector](https://github.com/ibm-cds-labs/metrics-collector)) which is a simple service for capture user interaction events and store them in a Cloudant database.   
+This project is related to the metrics-collector project ([metrics-collector](https://github.com/ibm-cds-labs/metrics-collector)) which is a simple service for capture user interaction events and store them in a Cloudant database.
 Metrics Analytics is a couch app application that provides simple but powerful visualizations on the user data collected by the metrics-collector application. It is implemented using [d3](http://d3js.org/), [angular](https://angularjs.org) and [bootstrap](http://getbootstrap.com/).
+
+**By using these 2 projects, you can easily instrument your application to track how your users use it and get powerful reports on the data**
 
 User tasks:  
 *  Select the application you want to view reports on. Applications are identified by a unique id which is included in the tracking scrip tag. e.g:  
@@ -13,7 +15,7 @@ User tasks:
 	* Pie Chart  
 	* Line Chart  
 	* Table 
-* Use the combo-box to select a query from the list of built-in queries.  	*  By Total Events
+* Use the combo-box to select a query from the list of built-in queries.   	*  By Total Events
 	*  By Search Category  
 	Note for developers: if you don't find a built-in query that fits your needs, it is very simple to add your own by editing the app/app.js file:
 ``` javascript  
@@ -26,8 +28,15 @@ $scope.visualizations=[
 	    {name:"By Search Category", view: "search_by_categories", builder: getTotalEventsChartBuilder() },
 	    {name:"My very own query", view: "supporting_custom_view", builder: getMyCustomQueryBuilder() }
 	];
-` 
-
+```  
+* Use the date picker to select a date range for your query  
+	* Today
+	* Yesterday
+	* Last 7 days
+	* Last 30 days
+	* This Month
+	* Last Month
+	* Custom range
 
 ## A word about CouchApps
 CouchApps are web applications which can be served directly from [CouchDB](http://couchdb.apache.org). This gives them the nice property of replicating just like any other data stored in CouchDB. They are also simple to write as they can use the built-in jQuery libraries and plugins that ship with CouchDB.
