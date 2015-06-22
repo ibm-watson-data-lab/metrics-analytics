@@ -3,7 +3,7 @@
 This project is related to the metrics-collector project ([metrics-collector](https://github.com/ibm-cds-labs/metrics-collector)) which is a simple service for capture user interaction events and store them in a Cloudant database.
 Metrics Analytics is a couch app application that provides simple but powerful visualizations on the user data collected by the metrics-collector application. It is implemented using [d3](http://d3js.org/), [angular](https://angularjs.org) and [bootstrap](http://getbootstrap.com/).
 
-**By using these 2 projects, you can easily instrument your application to track how your users use it and get powerful reports on the data**
+**Note: By using these 2 projects, you can easily instrument your application to track how your users use it and get powerful reports on the data**
 
 User tasks:  
 *  Select the application you want to view reports on. Applications are identified by a unique id which is included in the tracking scrip tag. e.g:  
@@ -15,7 +15,8 @@ User tasks:
 	* Pie Chart  
 	* Line Chart  
 	* Table 
-* Use the combo-box to select a query from the list of built-in queries.   	*  By Total Events
+* Use the combo-box to select a query from the list of built-in queries.   	
+	*  By Total Events
 	*  By Search Category  
 	Note for developers: if you don't find a built-in query that fits your needs, it is very simple to add your own by editing the app/app.js file:
 ``` javascript  
