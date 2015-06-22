@@ -6,6 +6,8 @@ function getTotalEventsChartBuilder(){
 			var visualization = params.visualization;
 			var presentationStyle = params.presentationStyle;
 			
+			this.colorMap = {};
+			
 			//Remember which series the user wants to enable/disable
 			this.$scope.userSeriesSelections = this.$scope.userSeriesSelections || {};
 			this.$scope.toggleSerieSelection = function(serie){
@@ -13,12 +15,14 @@ function getTotalEventsChartBuilder(){
 				this.$scope.selectVisualization();
 			}.bind(this);
 			
-			var margin = this.margin = {top: 20, right: 30, bottom: 130, left: 40};
-			var w = 500;
+			var margin = this.margin = {top: 20, right: 30, bottom: 100, left: 40};
+			var w = 700;
 			var h = 500;
 			if ( params.presentationStyle == "chart"){
 				w = 1100;
 				ht = 500;
+			}else if ( params.presentationStyle == "pie"){
+				margin = this.margin = {top: 20, right: 30, bottom: 100, left: 100};
 			}
 			var width = this.width = w - margin.left - margin.right;
 			var height = this.height = h - margin.top - margin.bottom;
@@ -73,7 +77,11 @@ function getTotalEventsChartBuilder(){
 
 			h += golden_ratio_conjugate;
 			h %= 1;
-			return hslToRgb(h, 0.5, 0.60);
+			var ret = hslToRgb(h, 0.5, 0.60);
+			if ( this.colorMap.hasOwnProperty(ret) ){
+				return randomColor();
+			}
+			return ret;
 		},
 		
 		generateCustomHTML : function(){
@@ -316,8 +324,10 @@ function getTotalEventsChartBuilder(){
 		renderPie: function(data){
 			
 			//Prep the data
+			var totalValue = 0;
 			var nested = d3.nest().key(
 					function(d){
+						totalValue += d.value;
 						return d.key[4];
 					}
 				).entries(data);
@@ -334,6 +344,7 @@ function getTotalEventsChartBuilder(){
 				d.values.forEach( function(f){ 
 					d.value += f.value;
 				});
+				d.key += " (" + (d.value/totalValue * 100).toFixed(0) + "%)";
 				delete d.values;	//don't need it anymore
 			}.bind(this));
 			
@@ -368,6 +379,8 @@ function getTotalEventsChartBuilder(){
 				}
 				
 				gradPie.draw = function(id, data, cx, cy, r){
+					var arc = d3.svg.arc().innerRadius(r * .6).outerRadius(r);
+					var labelr = r; // radius for label anchor
 					var gPie = d3.select("#"+id).append("g")
 						.attr("transform", "translate(" + cx + "," + cy + ")")
 						
@@ -398,21 +411,20 @@ function getTotalEventsChartBuilder(){
 						.data( pie(data) )
 						.enter().append("text")
 						.attr("class", "percent")
-						.attr("x",function(d){ 
-								return 0; //0.6 * 130 *Math.cos(0.5*(d.startAngle+d.endAngle));
-							}
-						)
-						.attr("y",function(d){ 
-								return 0; //0.6 * 100 *Math.sin(0.5*(d.startAngle+d.endAngle));
-							}
-						)
+						.attr("dy", ".35em")
+					    .attr("text-anchor", function(d) {
+					        return (d.endAngle + d.startAngle)/2 > Math.PI ? "end" : "start";
+					    })
 						.text( function(d){
 							return d.data.key;
 						})
 						.attr("transform", function(d){
-							return "rotate(" + (d.endAngle - d.startAngle)*50 + ")";
+							var c = arc.centroid(d),
+				            x = c[0],
+				            y = c[1],
+				            h = Math.sqrt(x*x + y*y);
+					        return "translate(" + (x/h * (r + 10)) +  ',' + (y/h * (r+10)) +  ")"; 
 						})
-						.style("text-anchor", "end")
 						.each(
 							function(d){
 								this._current=d;
@@ -426,7 +438,7 @@ function getTotalEventsChartBuilder(){
 			var chart = this.chart;
 			chart.append("g").attr("id","pie");
 
-			gradPie.draw("pie", data, 200, 200, 210);
+			gradPie.draw("pie", data, 200, 200, 180);
 		}
 	};
 }

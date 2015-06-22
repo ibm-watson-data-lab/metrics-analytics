@@ -26,7 +26,6 @@
 }
 
 svg text.percent{
-	fill:white;
-	text-anchor:middle;
+	fill:black;
 	font-size:12px;
 }
