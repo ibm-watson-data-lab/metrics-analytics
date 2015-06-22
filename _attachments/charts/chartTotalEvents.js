@@ -15,7 +15,7 @@ function getTotalEventsChartBuilder(){
 				this.$scope.selectVisualization();
 			}.bind(this);
 			
-			var margin = this.margin = {top: 20, right: 30, bottom: 100, left: 40};
+			var margin = this.margin = {top: 20, right: 30, bottom: 130, left: 40};
 			var w = 700;
 			var h = 500;
 			if ( params.presentationStyle == "chart"){
