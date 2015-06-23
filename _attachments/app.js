@@ -49,7 +49,9 @@ var mainApp = angular.module('visualizationApp', [
 	//Contains all the supported visualization
 	$scope.visualizations=[
 	    {name:"By Events - total", view: "grouped_events", builder: getTotalEventsChartBuilder() },
-	    {name:"By Search Category", view: "search_by_categories", builder: getTotalEventsChartBuilder() }
+	    {name:"By Search Category", view: "search_by_categories", builder: getTotalEventsChartBuilder() },
+	    {name:"By Platform", view: "events_by_platform", builder: getTotalEventsChartBuilder() },
+	    {name:"By Browser", view: "events_by_browser", builder: getTotalEventsChartBuilder() }
 	];
 	
 	$scope.selectedVisualization=$scope.visualizations[0];
