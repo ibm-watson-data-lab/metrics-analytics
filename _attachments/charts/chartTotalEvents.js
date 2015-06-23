@@ -1,3 +1,12 @@
+function getValue( d ){
+	if ( isFinite(d) ){
+		return d;
+	}else if ( d.hasOwnProperty("count") ){
+		return d.count;
+	}
+	throw new Error("Invalid Data");
+}
+
 function getTotalEventsChartBuilder(){
 	return {
 		//Returns custom view options
@@ -133,7 +142,7 @@ function getTotalEventsChartBuilder(){
 			nested.forEach( function(d){
 				d.value = 0;
 				d.values.forEach( function(f){ 
-					d.value += f.value;
+					d.value += getValue(f.value);
 				});
 				delete d.values;	//don't need it anymore
 			});
@@ -147,7 +156,7 @@ function getTotalEventsChartBuilder(){
 				);
 			x.domain( domainValues );
 			y.domain([0, d3.max(data, function(d) { 
-							return d.value; 
+							return getValue(d.value); 
 						 })
 				     ]
 			);
@@ -172,9 +181,15 @@ function getTotalEventsChartBuilder(){
 				.data(data)
 				.enter().append("rect")
 				.attr("class", "bar")
-				.attr("x", function(d) { return x(d.key); })
-				.attr("y", function(d) { return y(d.value); })
-				.attr("height", function(d) { return height - y(d.value); })
+				.attr("x", function(d) { 
+					return x(d.key); 
+				})
+				.attr("y", function(d) {
+					return y(getValue(d.value)); 
+				})
+				.attr("height", function(d) { 
+					return height - y(getValue(d.value)); 
+				})
 				.attr("width", x.rangeBand());
 		},
 		
@@ -226,7 +241,7 @@ function getTotalEventsChartBuilder(){
 			
 			nested.forEach( function(d){
 				d.values.forEach( function(f){ 
-					d[f.key[4]]=f.value;	//f.key[4] is the event type
+					d[f.key[4]]=getValue(f.value);	//f.key[4] is the event type
 				});
 				d.date = d.key;		//nested object use field key, reset to date
 				delete d.key;
@@ -327,7 +342,7 @@ function getTotalEventsChartBuilder(){
 			var totalValue = 0;
 			var nested = d3.nest().key(
 					function(d){
-						totalValue += d.value;
+						totalValue += getValue(d.value);
 						return d.key[4];
 					}
 				).entries(data);
@@ -342,9 +357,9 @@ function getTotalEventsChartBuilder(){
 				d.color = this.$scope.userSeriesSelections[ d.key ].color;
 				d.value = 0;
 				d.values.forEach( function(f){ 
-					d.value += f.value;
+					d.value += getValue(f.value);
 				});
-				d.key += " (" + (d.value/totalValue * 100).toFixed(0) + "%)";
+				d.key += " (" + (getValue(d.value)/totalValue * 100).toFixed(0) + "%)";
 				delete d.values;	//don't need it anymore
 			}.bind(this));
 			
@@ -356,7 +371,7 @@ function getTotalEventsChartBuilder(){
 				var pie = d3.layout.pie().sort(null)
 					.value(
 						function(d) {
-							return d.value;
+							return getValue(d.value);
 						}
 					);
 						

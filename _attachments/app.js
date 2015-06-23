@@ -50,6 +50,27 @@ var mainApp = angular.module('visualizationApp', [
 	$scope.visualizations=[
 	    {name:"By Events - total", view: "grouped_events", builder: getTotalEventsChartBuilder() },
 	    {name:"By Search Category", view: "search_by_categories", builder: getTotalEventsChartBuilder() },
+	    {name:"Top 10 searches", view: "grouped_searches", builder: getTotalEventsChartBuilder(), 
+	    	filter: function( data ){
+	    		data.rows.sort( function(a, b){
+	    			return b.value.count - a.value.count;
+	    		});
+	    		//Limit to 10 unique values
+	    		var map = {};
+	    		var newAr = [];
+	    		var limit = 0;
+	    		for ( var i = 0; i < data.rows.length; i++ ){
+	    			if ( !map.hasOwnProperty( data.rows[i].key[4] )){
+	    				map[ data.rows[i].key[4] ] = true;
+	    				newAr.push( data.rows[i] );
+	    				if ( ++limit >= 10 ){
+	    					break;
+	    				}
+	    			}
+	    		}
+	    		data.rows = newAr;
+	    	} 
+	    },
 	    {name:"By Platform", view: "events_by_platform", builder: getTotalEventsChartBuilder() },
 	    {name:"By Browser", view: "events_by_browser", builder: getTotalEventsChartBuilder() }
 	];
@@ -95,6 +116,9 @@ var mainApp = angular.module('visualizationApp', [
     			startkey:getLookupKey( startDateFilter, 0 ),
 	      		endkey: getLookupKey( endDateFilter, {} ),
 	        	success: function( data ){
+	        		if ( $scope.selectedVisualization.filter ){
+	        			$scope.selectedVisualization.filter( data );
+	        		}
 	        		if ( builder.applyUserSelections ){
 	        			data = builder.applyUserSelections(data.rows);
 	        		}else{
@@ -139,6 +163,7 @@ var mainApp = angular.module('visualizationApp', [
 	        	}
 	    	};
 	    	angular.extend( options, customOptions || {} );
+	    	angular.extend( options, $scope.selectedVisualization.viewOptions || {} );
 	    	
 	    	var istable = $scope.presentationStyle == "table";
 	    	var viewName = (istable ? "all_events_table" : $scope.selectedVisualization.view );
