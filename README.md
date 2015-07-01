@@ -6,7 +6,7 @@ Metrics Analytics is a couch app application that provides simple but powerful v
 **Note: By using these 2 projects, you can easily instrument your application to track how your users use it and get powerful reports on the data**
 
 User tasks:  
-*  Select the application you want to view reports on. Applications are identified by a unique id which is included in the tracking scrip tag. e.g:  
+*  Select the application you want to view reports on. Applications are identified by a unique id which is included in the tracking script tag. e.g:  
 `
 <script src="http://metrics-collector.domainname/tracker.js" siteid="my.app.id"></script>
 `  
