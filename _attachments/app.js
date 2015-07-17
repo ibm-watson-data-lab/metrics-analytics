@@ -32,16 +32,16 @@ var mainApp = angular.module('visualizationApp', [
 	
 	var couchApp = null;
 	//Acquire the app
-    $.couch.app(function(app) {
-    	couchApp = app;
-    	
-    	$scope.retrieveApps();
-    	
-    	//Boostrap
-    	$scope.selectVisualization();
-    });
-    
-    //Selected application
+  $.couch.app(function(app) {
+  	couchApp = app;
+  	
+  	$scope.retrieveApps();
+  	
+  	//Boostrap
+  	$scope.selectVisualization();
+  });
+  
+  //Selected application
 	$scope.selectedApp = null;
 	
 	$scope.contextualChartHTML = "";
@@ -77,11 +77,10 @@ var mainApp = angular.module('visualizationApp', [
 	
 	$scope.selectedVisualization=$scope.visualizations[0];
 	
-    var path = unescape(document.location.pathname).split('/');
-    var design = path[3];
+  var path = unescape(document.location.pathname).split('/');
+  var design = path[3];
     
 	$scope.selectVisualization = function(visualization){
-		
 		//Reset node
 		d3.select("#chart").html("").style("display","none");
 		d3.select("#chartContainer").html("").style("display", "none");

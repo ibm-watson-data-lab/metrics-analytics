@@ -23,7 +23,7 @@ User tasks:
 1. Use the combo-box to select a query from the list of built-in queries.   	
 	*  By Total Events
 	*  By Search Category  
-	Note for developers: if you don't find a built-in query that fits your needs, it is very simple to add your own by editing the app/app.js file:
+	*Note for developers: if you don't find a built-in query that fits your needs, it is very simple to add your own by editing the app/app.js file:*
 	
    ```javascript  
 //Add JSON object to the following table:

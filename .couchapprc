@@ -1,1 +1,10 @@
-{}
+{
+	"env": {
+		"default": {
+			"db": "http://localhost:5984/tracker_db"
+		},
+		"remote": {
+			"db": "https://location-tracker:abcd1234@education.cloudant.com/locationtracker"
+		}
+	}
+}

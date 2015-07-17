@@ -4,7 +4,7 @@
     <title>Tracker Events Visualization CouchApp</title>
     <script src="vendor/couchapp/angular.min.js"></script>
     <script src="vendor/couchapp/jquery.min.js"></script>
-    <script src="vendor/couchapp/bootstrap.js"></script>
+    <script src="vendor/couchapp/bootstrap.min.js"></script>
     <script src="vendor/couchapp/ui-bootstrap-tpls-0.12.1.js"></script>
     
     <script src="vendor/couchapp/jquery.couch.js"></script>
@@ -39,11 +39,11 @@
 					<span class="btn-toolbar" role="toolbar">
 						<span class="dropdown" style="margin-left:20px">
 							<button class="btn btn-default dropdown-toggle" type="button" id="visualizationsMenu" data-toggle="dropdown">
-								{{selectedVisualization.name}} <span class="caret"></span>
+								{{selectedApp.key}} <span class="caret"></span>
 							</button>
 							<ul class="dropdown-menu">
-								<li ng-repeat="visualization in visualizations"	ng-click="selectVisualization(visualization)">
-									<a href="#">{{visualization.name}}</a>
+								<li ng-repeat="app in apps"	ng-click="selectApp(app)">
+									<a href="#">{{app.key}}</a>
 								</li>
 							</ul>
 						</span>
@@ -55,9 +55,11 @@
 							<button type="button" ng-class="['btn', 'btn-default', (presentationStyle=='pie' ? 'active': '')]" ng-click="togglePresentation( 'pie' )">
 								<i class="icon-large icon-pie-chart"></i>
 							</button>
-							<button type="button" ng-class="['btn', 'btn-default', (presentationStyle=='line' ? 'active': '')]" ng-click="togglePresentation( 'line' )">
-								<i class="icon-large icon-stats"></i>
-							</button>
+              
+              <!-- Get rid of line graphs for now -->
+              <!-- <button type="button" ng-class="['btn', 'btn-default', (presentationStyle=='line' ? 'active': '')]" ng-click="togglePresentation( 'line' )">
+                <i class="icon-large icon-stats"></i>
+              </button> -->
   							<button type="button" ng-class="['btn', 'btn-default', (presentationStyle=='table' ? 'active': '')]" ng-click="togglePresentation( 'table' )">
   								<i class="icon-large icon-table"></i>
   							</button>
@@ -73,18 +75,11 @@
 			</div>
 			<div class="row">
 				<div class="col-md-2">
-					<div class="input-group">
-	  					<span class="input-group-addon glyphicon glyphicon-search"></span>
-	  					<input type="search" ng-model="query" class="form-control" placeholder="Application id">
-					</div>
 					<p>
 					<ul class="nav nav-pills nav-stacked">
-						<li ng-repeat="app in apps|filter:query as results" ng-class="selectedClass(app)" ng-click="selectApp(app)">
-							<a href="#"> {{app.key}} <span class="badge">{{app.value}}</span></a>
+						<li ng-repeat="visualization in visualizations" ng-class="selectedClass(app)" ng-click="selectVisualization(visualization)">
+							<a href="#"> {{visualization.name}} </a>
 						</li>
-						<li class="animate-repeat" ng-if="results.length == 0">
-	     					<strong>No results match the query</strong>
-	    				</li>
 					</ul>
 				</div>
 				<div class="col-md-8">
