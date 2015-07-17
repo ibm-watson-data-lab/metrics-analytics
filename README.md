@@ -22,8 +22,12 @@ User tasks:
 
 1. Use the combo-box to select a query from the list of built-in queries.   	
 	*  By Total Events
-	*  By Search Category  
-	*Note for developers: if you don't find a built-in query that fits your needs, it is very simple to add your own by editing the app/app.js file:*
+	*  By Search Category
+  * Top 10 searches
+  * By Platform
+  * By Browser  
+  
+   > Note for developers: if you don't find a built-in query that fits your needs, it is very simple to add your own by editing the js/app.js file:*
 	
    ```javascript  
 //Add JSON object to the following table:
@@ -36,6 +40,7 @@ $scope.visualizations=[
 	    {name:"My very own query", view: "supporting_custom_view", builder: getMyCustomQueryBuilder() }
 	];
 ```  
+
 1. Use the date picker to select a date range for your query  
 	* Today
 	* Yesterday

@@ -37,7 +37,7 @@ var mainApp = angular.module('visualizationApp', [
   	
   	$scope.retrieveApps();
   	
-  	//Boostrap
+  	//Bootstrap
   	$scope.selectVisualization();
   });
   
