@@ -1,8 +1,8 @@
 function getValue( d ){
 	if ( isFinite(d) ){
 		return d;
-	}else if ( d.hasOwnProperty("count") ){
-		return d.count;
+	}else if ( d.hasOwnProperty("topResultCount") ){ // or count
+		return d.topResultCount;
 	}
 	throw new Error("Invalid Data");
 }

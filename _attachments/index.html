@@ -40,12 +40,12 @@
 					<span class="btn-toolbar" role="toolbar">
             
             <!-- date range picker -->
-						<span id="reportrange" class="pull-left" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+						<span id="reportrange" class="pull-left" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; font-size:150%">
 	    					<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
 	    					<span></span> <b class="caret"></b>
 						</span>
 
-						<span class="dropdown pull-right" style="margin-left:20px">
+						<span class="dropdown pull-right">
 							<button class="btn btn-default dropdown-toggle" type="button" id="visualizationsMenu" data-toggle="dropdown">
 								{{selectedApp.key}} <span class="caret"></span>
 							</button>
@@ -56,7 +56,7 @@
 							</ul>
 						</span>
 						
-						<div class="btn-group btn-group-lg" data-toggle="buttons" role="group">
+						<div class="btn-group btn-group-lg" data-toggle="buttons" role="group" style="; padding-left:24px">
 							<button type="button" ng-class="['btn', 'btn-default', (presentationStyle=='chart' ? 'active': '')]" ng-click="togglePresentation( 'chart' )">
 								<i class="icon-large icon-charts"></i>
 							</button>
