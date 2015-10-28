@@ -12,7 +12,7 @@ See it in action. [Visit our demo version](https://examples.cloudant.com/tracker
 
 ##Try the tutorial
 
-This tutorial shows you how to build MapReduce views in Cloudant/CouchDB and wire them to [D3](http://d3js.org) for visualization.
+Our full tutorial shows you how to build MapReduce views in Cloudant/CouchDB and wire them to [D3](http://d3js.org) for visualization.
 
 Read all the details and try it yourself:
 
