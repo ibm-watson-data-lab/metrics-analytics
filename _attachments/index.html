@@ -1,93 +1,54 @@
 <!DOCTYPE html>
 <html ng-app="visualizationApp">
   <head>
-    <title>Tracker Events Visualization CouchApp</title>
+    <title>IBM Cloud Data Services | Simple Metrics Visualization</title>
+
     <script src="vendor/couchapp/angular.min.js"></script>
     <script src="vendor/couchapp/jquery.min.js"></script>
-    <script src="vendor/couchapp/bootstrap.min.js"></script>
-    <script src="vendor/couchapp/ui-bootstrap-tpls-0.12.1.js"></script>
-    
-    <script src="vendor/couchapp/jquery.couch.js"></script>
-  	<script src="vendor/couchapp/jquery.couch.app.js"></script>
-  	<script src="vendor/couchapp/jquery.couch.app.util.js"></script>
-    
+    <script src="vendor/couchapp/angular-route.min.js"></script>
+
+    <!--<script src="vendor/couchapp/jquery.couch.js"></script>
+    <script src="vendor/couchapp/jquery.couch.app.js"></script>
+    <script src="vendor/couchapp/jquery.couch.app.util.js"></script>-->
+
     <script src="vendor/couchapp/d3.min.js"></script>
+    <script src="vendor/couchapp/topojson.v1.min.js"></script>
     <script src="vendor/couchapp/moment.min.js"></script>
     <script src="vendor/couchapp/daterangepicker.js"></script>
+
     <script src="js/app.js"></script>
-    <script src="js/chartTotalEvents.js"></script>
-    <script src="js/dateFilter.js"></script>
-    <link rel="stylesheet" href="style/main.css" type="text/css">
-    <link rel="stylesheet" href="style/bootstrap.min.css" type="text/css"/>
-    <link rel="stylesheet" href="style/bootstrap.icon-large.min.css" type="text/css"/>
-    <link rel="stylesheet" href="style/font-awesome.min.css" type="text/css"/>
+    <script src="js/service-metrics-vis.js"></script>
+    <script src="js/simpledatavis.js"></script>
+
     <link rel="stylesheet" href="style/daterangepicker-bs3.css" type="text/css"/>
+    <link rel="stylesheet" href="style/master.css" type="text/css">
+    <link rel="stylesheet" href="style/main.css" type="text/css">
+  </head>
+  <body class="capped-layout theme_light">
+    <header class="capped-layout_cap app-banner">
+      <a class="app-banner_title" rel="home" href="https://developer.ibm.com/clouddataservices">IBM Cloud Data Services // Dev</a>
+    </header>
 
-</head>
-<body class="container-fluid">
-  <h1>Tracker metrics Visualization sample app</h1>
-	
-		<div class="container-fluid" style="margin-top:60px" ng-controller="vizModel">
-			<div class="row">
-				<div class="col-md-2">
-				</div>
-				<div class="col-md-8">
-          
-					<span class="btn-toolbar" role="toolbar">
-            
-            <!-- date range picker -->
-						<span id="reportrange" class="pull-left" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; font-size:150%">
-	    					<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
-	    					<span></span> <b class="caret"></b>
-						</span>
+    <div class="capped-layout_body bookend-layout">
+      <nav class="bookend-layout_bookend theme_dark" ng-controller="navCtrl">
+        <ul class="tree-nav">
+          <li class="tree-nav_item">
+            <a class="tree-nav_link" href="#/">Simple Metrics Visualization</a>
+            <ul class="tree-nav">
+              <li class="tree-nav_item">
+                <a class="tree-nav_link" href="#/summary"
+                  ng-class="{'current': currentPath == '/summary'}">All Sites Summary</a></li>
+              <li class="tree-nav_item">
+                <a class="tree-nav_link" href="#/dashboard"
+                  ng-class="{'current': currentPath == '/dashboard'}">Per Site Overview</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
 
-						<span class="dropdown pull-right">
-							<button class="btn btn-default dropdown-toggle" type="button" id="visualizationsMenu" data-toggle="dropdown">
-								{{selectedApp.key}} <span class="caret"></span>
-							</button>
-							<ul class="dropdown-menu">
-								<li ng-repeat="app in apps"	ng-click="selectApp(app)">
-									<a href="#">{{app.key}}</a>
-								</li>
-							</ul>
-						</span>
-						
-						<div class="btn-group btn-group-lg" data-toggle="buttons" role="group" style="; padding-left:24px">
-							<button type="button" ng-class="['btn', 'btn-default', (presentationStyle=='chart' ? 'active': '')]" ng-click="togglePresentation( 'chart' )">
-								<i class="icon-large icon-charts"></i>
-							</button>
-							<button type="button" ng-class="['btn', 'btn-default', (presentationStyle=='pie' ? 'active': '')]" ng-click="togglePresentation( 'pie' )">
-								<i class="icon-large icon-pie-chart"></i>
-							</button>
-              
-  							<button type="button" ng-class="['btn', 'btn-default', (presentationStyle=='table' ? 'active': '')]" ng-click="togglePresentation( 'table' )">
-  								<i class="icon-large icon-table"></i>
-  							</button>
-						</div>		
-						
-					</span>
-				</div>
-				<div class="col-md-2"></div>
-			</div>
-			<div class="row">
-				<div class="col-md-2">
-					<p>
-					<ul class="nav nav-pills nav-stacked">
-						<li ng-repeat="visualization in visualizations" ng-class="selectedClass(app)" ng-click="selectVisualization(visualization)">
-							<a href="#"> {{visualization.name}} </a>
-						</li>
-					</ul>
-				</div>
-				<div class="col-md-8">
-					<div class="well text-center">
-						<svg class="chart" id="chart"></svg>
-						<div id="chartContainer"></div>
-					</div>
-				</div>
-				<div class="col-md-2">
-					<customhtml id="contextualChartHTML" bindmodel="contextualChartHTML"></customhtml>
-				</div>
-			</div>
-		</div>
-	</body>
+      <div class="bookend-layout_body theme_light bg_white scrollable-y">
+        <div ng-view></div>
+      </div>
+    </div>
+  </body>
 </html>

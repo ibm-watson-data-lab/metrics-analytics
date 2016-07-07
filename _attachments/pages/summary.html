@@ -1,0 +1,57 @@
+<section class="layout_section theme_light">
+  <h1 class="type_heading">All Sites Summary</h1>
+
+  <p class="type_copy">
+    A summation of activities (e.g., page views, searches, etc.) across the sites being
+    tracked.
+  </p>
+</section>
+
+<section class="layout_section">
+  <h1 class="type_subhead">
+    <mark class="type_mark">Daily total across all sites in the past six months</mark>
+  </h1>
+
+  <figure class="guide-example">
+    <div id="summarychart"
+      data-vis="http://127.0.0.1:5984/tracker_db/_design/app/_view"
+      data-vis-view="summary_by_day"
+      data-vis-chart="time"
+      data-vis-param-1="startkey={{startkey}}"
+      data-vis-endkey="{{endkey}}"
+      data-vis-group=true
+      data-vis-ondata="dailyOnData"></div>
+  </figure>
+
+  <hr>
+
+  <h1 class="type_subhead">
+    <mark class="type_mark">Location of activities across all sites</mark>
+  </h1>
+
+  <figure class="guide-example">
+    <div id="geolocation"></div>
+  </figure>
+
+  <hr>
+
+  <h1 class="type_subhead">
+    <mark class="type_mark">Total all time for each site</mark>
+  </h1>
+
+  <figure class="guide-example">
+    <div class="table_container">
+      <div id="summarytable"
+        data-vis="http://127.0.0.1:5984/tracker_db/_design/app/_view"
+        data-vis-view="summary_by_day"
+        data-vis-chart="table"
+        data-vis-startkey="[&quot;&quot;]"
+        data-vis-endkey="[{}]"
+        data-vis-group=1
+        data-vis-htmlcells=true
+        data-vis-ondata="totalOnData"></div>
+    </div>
+  </figure>
+
+  <hr>
+</section>
