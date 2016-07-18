@@ -1,227 +1,233 @@
 'use strict';
 
 //Visualization App
-var mainApp = angular.module('visualizationApp', [
-  'ui.bootstrap'
-],function($locationProvider) {
-    $locationProvider.html5Mode({'enabled': true, 'requireBase': false});
-})
+var mainApp = angular.module('visualizationApp',
+  ['ngRoute', 'visualizationAppService'],
+  function($locationProvider) {
+    //$locationProvider.html5Mode({'enabled': true, 'requireBase': false});
+  }
+)
 
 .config(function($sceProvider) {
   $sceProvider.enabled(false);
 })
 
-.controller('vizModel', ['$scope', '$http', '$location',
-  function($scope, $http, $location) {
-	
-	$scope.presentationStyle = "chart";
-	var startDateFilter = null;
-	var endDateFilter = null;
-	
-	function updateDates( start, end ){
-		startDateFilter = start.format('YYYY-MM-DD');
-		endDateFilter = end.format('YYYY-MM-DD');
-	}
-	
-	updateDates( initStartDate, initEndDate );
-	configureDateFilter( function( start, end, label ){
-		updateDates( start, end );
-		$scope.selectVisualization();
-	});
-	
-	
-	var couchApp = null;
-	//Acquire the app
-  $.couch.app(function(app) {
-  	couchApp = app;
-  	
-  	$scope.retrieveApps();
-  	
-  	//Bootstrap
-  	$scope.selectVisualization();
-  });
-  
-  //Selected application
-	$scope.selectedApp = null;
-	
-	$scope.contextualChartHTML = "";
-	
-	//Contains all the supported visualization
-	$scope.visualizations=[
-    {name:"By Events - total", view: "grouped_events", builder: getTotalEventsChartBuilder() },
-    {name:"By Search Category", view: "search_by_categories", builder: getTotalEventsChartBuilder() },
-    {name:"By Platform", view: "events_by_platform", builder: getTotalEventsChartBuilder() },
-    {name:"By Browser", view: "events_by_browser", builder: getTotalEventsChartBuilder() }, 
-    {name:"Top 10 searches", view: "grouped_searches", builder: getTotalEventsChartBuilder(), 
-      filter: function( data ){
-        data.rows.sort( function(a, b){
-          return b.value.count - a.value.count;
-        });
-        //Limit to 10 unique values
-    		var map = {};
-    		var newAr = [];
-    		var limit = 0;
-    		for ( var i = 0; i < data.rows.length; i++ ){
-    			if ( !map.hasOwnProperty( data.rows[i].key[4] )){
-    				map[ data.rows[i].key[4] ] = true;
-    				newAr.push( data.rows[i] );
-    				if ( ++limit >= 10 ){
-    					break;
-    				}
-    			}
-    		}
-    		data.rows = newAr;
-    	} 
-    }
-	];
-	
-	$scope.selectedVisualization=$scope.visualizations[0];
-	
-  var path = unescape(document.location.pathname).split('/');
-  var design = path[3];
-    
-	$scope.selectVisualization = function(visualization){
-		//Reset node
-		d3.select("#chart").html("").style("display","none");
-		d3.select("#chartContainer").html("").style("display", "none");
-		
-		$scope.selectedVisualization = visualization || $scope.selectedVisualization;
-		
-		if ( $scope.selectedApp == null ){
-			//No app selected, nothing to show
-			return;
-		}
-		
-		function getLookupKey( date, wildcard ){
-			var ar = date ? date.split("-") : [];
-			if ( ar.length == 3 ){
-				return [$scope.selectedApp.key, Number(ar[0]), Number(ar[1]), Number(ar[2]), wildcard];
-			}else{
-				return [0, 0, 0, $scope.selectedApp.key, wildcard];
-			}
-		}
-		
-		if ( $scope.selectedVisualization ){
-			//Render now
-			var builder = $scope.selectedVisualization.builder;
-			//Set the angular scope
-			builder.$scope = $scope;
-      
-    	var customOptions = builder.init( {
-    		selector: "#chart", 
-    		visualization: $scope.selectedVisualization,
-    		presentationStyle: $scope.presentationStyle
-    	});
-      
-    	var options = {
-  			startkey:getLookupKey( startDateFilter, 0 ),
-      		endkey: getLookupKey( endDateFilter, {} ),
-        	success: function( data ){
-        		if ( $scope.selectedVisualization.filter ){
-        			$scope.selectedVisualization.filter( data );
-        		}
-        		if ( builder.applyUserSelections ){
-        			data = builder.applyUserSelections(data.rows);
-        		}else{
-        			data = data.rows;
-        		}
-        		
-        		if ( data.length == 0 ){
-    				  return;
-    			  }
-        		
-        		if ( !istable ){
-        			d3.select("#chart").style("display","");
-        			var customHTML = null;
-        			if ( $scope.presentationStyle == "chart" ){
-        				customHTML = builder.renderChart( data );
-        			}else if ( $scope.presentationStyle == "pie" ){
-        				if ( builder.renderPie ){
-        					customHTML = builder.renderPie( data );
-        				}
-        			}
-        			else{
-        				if ( builder.renderLine ){
-        					customHTML = builder.renderLine( data );
-        				}
-        			}
-        		}else{
-        			d3.select("#chartContainer").style("display", "");
-        			customHTML = builder.renderTable( data );
-        		}
-        		
-        		if ( !customHTML && builder.generateCustomHTML ){
-        			customHTML = builder.generateCustomHTML();
-        		}
-        		
-        		$scope.contextualChartHTML = "<div>" + (customHTML || "") + "</div>";
-        		$scope.$apply();
-        	},
-        	error: function( status, errMessage ){
-        		console.log( "error: " + errMessage );
-        		$scope.contextualChartHTML = "<div class='alert alert-danger' role='alert'" + errMessage + "</div>";
-        		$scope.$apply();
-        	}
-    	};
-    	angular.extend( options, customOptions || {} );
-    	angular.extend( options, $scope.selectedVisualization.viewOptions || {} );
-    	
-    	var istable = $scope.presentationStyle == "table";
-    	var viewName = (istable ? "all_events_table" : $scope.selectedVisualization.view );
-    	couchApp.db.view( design + "/" + viewName,options);
-		}
-	}
-	
-	$scope.retrieveApps = function(){
-		couchApp.db.view( design + "/grouped_apps",{
-			group:true,
-			success:function(data){
-				$scope.apps = data.rows;
-				//Select the first app
-				if ( data.rows.length > 0 ){
-					$scope.selectApp( data.rows[0] );
-				}
-				$scope.$apply();
-			},
-			error: function( status, errMessage ){
-				console.log("error: " + errMessage );
-			}
-		});
-	}
-	$scope.selectedClass = function( app ){
-    	if ( app == $scope.selectedApp){
-    		return "active";
-    	}
-    	return "";
-    }
-	$scope.selectApp = function(app){
-		if ( $scope.selectedApp != app ){
-			$scope.selectedApp = app;
-			$scope.selectVisualization();
-		}
-	}
-	
-	$scope.togglePresentation = function( style ){
-		if ( $scope.presentationStyle != style ){
-			$scope.presentationStyle = style;
-			$scope.selectVisualization();
-		}
-	}
+.config(function($routeProvider) {
+  $routeProvider
+    .when('/', {
+      templateUrl: '/tracker_db/_design/app/pages/home.html'
+    })
+    .when('/summary', {
+      templateUrl: '/tracker_db/_design/app/pages/summary.html',
+      controller: 'summaryCtrl'
+    })
+    .when('/dashboard', {
+      templateUrl: '/tracker_db/_design/app/pages/dashboard.html',
+      controller: 'dashboardCtrl',
+      reloadOnSearch: false,
+      resolve: {
+        sitesSummary: ['visService', function(visService) {
+          return visService.summary();
+        }]
+      }
+    })
+    .otherwise({
+      redirectTo: '/tracker_db/_design/app/index.html'
+    });
+})
+
+.controller('navCtrl', ['$scope',
+  function($scope) {
+    $scope.$root.$on('$routeChangeSuccess', function(event, current, previous) {
+      $scope.currentPath = current.$$route.originalPath;
+    });
   }]
 )
 
-.directive('customhtml', function($compile, $parse) {
-	return {
-		restrict: 'E',
-		link: function(scope, element, attr) {
-			scope.$watch(attr.bindmodel, function() {
-				element.html(
-					$parse(
-						attr.bindmodel
-					)(scope)
-				);
-				$compile(element.contents())(scope);
-			}, true);
-		}
-	}
-  })
+.controller('summaryCtrl', ['$scope', '$timeout', 'visService',
+  function($scope, $timeout, visService) {
+    // six month daily total of all sites combined
+    $scope.startkey = moment().subtract(5, 'month').startOf('month')
+      .format('[[]YYYY,M,D[]]');
+    $scope.endkey = moment().endOf('month')
+      .format('[[]YYYY,M,D[]]');
+
+    var callbacks = {};
+    
+    callbacks.dailyOnData = function(data) {
+      var rows = data.rows || [];
+      var allEvents = ['pageView', 'link', 'search'];
+      var events = [];
+
+      if (rows.length > 0) {
+        // format: [{ key:"", date:date, value:# }, ...]
+        rows.forEach(function(row) {
+          allEvents.forEach(function(event) {
+            if (row.value.hasOwnProperty(event)) {
+              events.push({
+                key: event,
+                date: row.key.length > 3 ?
+                      new Date(row.key[1], row.key[2]-1, row.key[3]) :
+                      new Date(row.key[0], row.key[1]-1, row.key[2]),
+                value: row.value[event]
+              });
+            }
+          });
+        });
+      }
+
+      return { data: events, keys: allEvents };
+    };
+
+    callbacks.totalOnData = function(data) {
+      var rows = data.rows || [];
+      var allCols = ['siteId'];
+      var allCounts = [];
+
+      for (var row in rows) {
+        rows[row].value['siteId'] = 
+          '<a href="#/dashboard?site=' + rows[row].key + '" class="type_link">' + rows[row].key + '</a>';
+
+        allCounts.push(rows[row].value);
+
+        for (var value in rows[row].value) {
+          if (allCols.indexOf(value) === -1) {
+            allCols.push(value);
+          }
+        }
+      }
+
+      return { fields: allCols, data: allCounts };
+    };
+
+    // all time total grouped by location
+    visService.totalPerLocation('#geolocation');
+
+    $scope.$on('$viewContentLoaded', function(event) {
+      console.log(event);
+      $timeout(function() {
+        visService.init(null, callbacks);
+      }, 0);
+    });
+  }]
+)
+
+.controller('dashboardCtrl', ['$scope', 'sitesSummary', '$location',
+  function($scope, sitesSummary, $location) {
+    $scope.sitesSummary = sitesSummary;
+    $scope.sites = sitesSummary.map(function(s) {
+      return {
+        siteId: s.siteId[0],
+        search: !!s.search
+      };
+    });
+    
+    var initStart = moment().subtract(59, 'days');
+    var initEnd = moment();
+    var minDate = moment().subtract(2, 'year').startOf('year');
+    var maxDate = moment().add(1, 'day');
+    
+    var updateInput = function(start, end) {
+      $('input[name="daterange"]')
+        .val(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+    }
+    
+    $('input[name="daterange"]')
+      .daterangepicker({
+        format: 'MM/DD/YYYY',
+        startDate: initStart,
+        endData: initEnd,
+        minDate: minDate,
+        maxDate: maxDate,
+        // dateLimit: { days: 180 },
+        ranges: {
+          'Today': [moment(), moment()],
+          'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+          'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+          'Last 30 Days': [moment().subtract(29, 'days'), moment()]
+        },
+        locale: {
+          applyLabel: 'Submit'
+        },
+        buttonClasses: ['button_calendar'],
+        applyClass: 'button_primary',
+        cancelClass: 'button_secondary',
+        opens: 'left'
+      },
+      function(startDate, endDate, label) {
+        updateInput(startDate, endDate);
+
+        $scope.$apply(function() {
+          $scope.dashboard.startDate = startDate.format('YYYY-MM-DD');
+          $scope.dashboard.endDate = endDate.format('YYYY-MM-DD');
+        });
+      });
+
+    updateInput(initStart, initEnd);      
+
+    var siteid = '', visname = null, charttype = null;
+    var search = $location.search();
+    if (search.hasOwnProperty('site')) {
+      siteid = search.site;
+    }
+    else if ($scope.sites.length > 0) {
+      siteid = $scope.sites[0].siteId;
+    }
+    if (search.hasOwnProperty('view')) {
+      visname = search.view;
+    }
+    if (search.hasOwnProperty('chart')) {
+      charttype = search.chart;
+    }
+
+    $scope.updateVis = function(visname, charttype) {
+      if (visname) {
+        $scope.dashboard.visName = visname;
+      }
+      if (charttype) {
+        $scope.dashboard.chartType = charttype;
+      }
+
+      $location.search({ site: $scope.dashboard.siteId });
+
+      $scope.disableSearches = $scope.sites.some(function(s) {
+        return $scope.dashboard.siteId == s.siteId && !s.search; 
+      });
+    }
+
+    $scope.dashboard = {
+      siteId: siteid,
+      startDate: initStart.format('YYYY-MM-DD'),
+      endDate: initEnd.format('YYYY-MM-DD'),
+      visName: visname || 'byBrowser',
+      chartType: charttype || 'donut'
+    };
+
+    $scope.disableSearches = $scope.sites.some(function(s) {
+      return $scope.dashboard.siteId == s.siteId && !s.search; 
+    });
+  }]
+)
+
+.directive('siteViz', ['visService', function(visService) {
+    return {
+      restrict: 'A',
+      scope: {
+        siteViz: '=',
+      },
+      replace: true,
+      templateUrl: '/tracker_db/_design/app/pages/vis.html',
+      link: function(scope, elem, attrs) {
+        var visElem = d3.select(elem[0]).select('.vis');
+
+        visService.siteChart(visElem, scope.siteViz);
+
+        scope.$watch('siteViz', function(newValue, oldValue) {
+          if (oldValue !== newValue) {
+            visService.siteChart(visElem, newValue);
+          }
+        }, true);
+      }
+    };
+  }]
+);

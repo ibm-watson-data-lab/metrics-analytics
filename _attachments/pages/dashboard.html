@@ -1,0 +1,49 @@
+<section class="layout_section theme_light">
+  <h1 class="type_heading">Per Site Overview</h1>
+
+  <p class="type_copy">
+    To view the metrics for a site over a specific date range, select the site from the
+    dropdown and enter the desired dates:
+  </p>
+
+  <div>
+    <select class="input_select" id="selected-site" name="site"
+      ng-model="dashboard.siteId" ng-change="updateVis()">
+      <option ng-repeat="site in sites" value="{{site.siteId}}">
+        {{site.siteId}}
+      </option>
+    </select>
+
+    <input readonly type="text" class="input_text input_daterange"
+      id="selected-daterange" name="daterange">
+  </div>
+</section>
+
+<section class="layout_section">
+  <div class="type_subhead">
+    <mark class="type_mark">{{ dashboard.siteId }}</mark>
+  </div>
+
+  <section>
+    <p class="type_copy">
+      <a class="type_link"
+         ng-class="{'disabled': dashboard.visName === 'byDaySummary'}"
+         ng-click="updateVis('byDaySummary','time')">Daily Activity</a> | 
+      <a class="type_link"
+         ng-class="{'disabled': dashboard.visName === 'byBrowser'}"
+         ng-click="updateVis('byBrowser','donut')">Browser Usage</a> 
+      <span ng-hide="disableSearches">|</span> 
+      <a class="type_link"
+         ng-class="{'disabled': dashboard.visName === 'topTenSearches'}"
+         ng-click="updateVis('topTenSearches','bar')"
+         ng-hide="disableSearches">Top Ten Searches</a> 
+      <span ng-hide="disableSearches">|</span> 
+      <a class="type_link"
+         ng-class="{'disabled': dashboard.visName === 'bySearchCategories'}"
+         ng-click="updateVis('bySearchCategories','bubble')"
+         ng-hide="disableSearches">Searches By Categories</a>
+    </p>
+
+    <div site-viz="dashboard"></div>
+  </section>
+</section>

@@ -1,31 +1,202 @@
 /* add styles here */
 
-.bar {
-  fill: steelblue;
+body {
+  overflow: hidden;
 }
 
-.axis text {
-  font: 20px sans-serif;
+.vis {
+  text-align: center;
 }
 
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
+.guide-example {
+  margin: 0;
+  padding: 2em 3em;
 }
 
-.x.axis path {
+.type_link {
+  cursor: pointer;
+}
+
+.type_link.disabled {
+  color: darkgrey;
+  cursor: not-allowed;
+  font-weight: initial;
+  text-decoration: none;
+}
+
+.type_link.disabled:hover {
+  color: darkgrey;
+}
+
+.table_basic th {
+  font-weight: 500;
+}
+
+.input_text {
+	max-width: 21rem;
+}
+
+.input_daterange {
+  float: right;
+}
+
+.daterangepicker {
+  border: 1px solid #e0e0e0;
+  border-radius: 0;
   display: none;
 }
 
-.line {
-  fill: none;
-  stroke: steelblue;
-  stroke-width: 1.5px;
+.daterangepicker .ranges {
+  width: 225px;
 }
 
-svg text.percent{
-	fill:black;
-	font-size:12px;
+.daterangepicker .ranges li {
+  background: #e0e0e0 none repeat scroll 0 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 0px;
+  color: #003c32;
+}
+
+.daterangepicker .ranges li.active,
+.daterangepicker .ranges li:hover {
+  background-color: #5aaafa;
+  border-color: #5aaafa;
+  color: #264a60;
+}
+
+.daterangepicker_start_input {
+  padding-right: 5px;
+  width: 50%;
+}
+
+.daterangepicker_end_input {
+  padding-left: 5px !important;
+  width: 50%;
+}
+
+.daterangepicker .ranges .input-mini {
+  background-color: #fff;
+  border: 1px solid #d3d9dd;
+  border-radius: 0px;
+  color: black;
+  display: block;
+  font-size: 0.75rem;
+  height: 1.5rem;
+  padding: 0.3rem 0 0.3rem 0.75rem;
+  width: 100%;
+}
+
+.daterangepicker .button_calendar {
+  margin-top: 15px;
+  width: 110px;
+}
+
+.daterangepicker td.active,
+.daterangepicker td.active:hover {
+  background-color: #5aaafa;
+  border-color: #5aaafa;
+  color: #264a60;
+}
+
+.daterangepicker .button_primary {
+  background-color: #5aaafa;
+  color: #264a60;
+}
+
+.daterangepicker .button_primary:hover {
+  background-color: #6fbfff;
+}
+
+.daterangepicker .button_secondary {
+  border-color: #5aaafa;
+  color: #264a60;
+}
+
+.daterangepicker .fa-arrow-right::before {
+  content: '\0003E';
+}
+
+.daterangepicker .fa-arrow-left::before {
+  content: '\0003C';
+}
+
+svg {
+  font-size: 0.85rem;
+  font-weight: 300;
+}
+
+.tooltip {
+  background-color: rgba(21, 41, 53, 0.9);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 300;
+  padding: 8px;
+  position: absolute;
+  visibility: hidden;
+  z-index: 10;
+}
+
+.timeline text.legend:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.axis line,
+.axis path {
+  fill: none;
+  stroke: #152935;
+}
+
+.land {
+  fill: #d3d9dd;
+}
+
+.dot,
+.line {
+  fill: none;
+  stroke-width: 1.25px;
+}
+
+.bubbletext {
+  fill: #ffffff;
+  font-size: 0.8rem;
+  pointer-events: none;
+  text-anchor: middle;
+}
+
+.spinner {
+  background-color: rgba(255, 255, 255, 0.45);
+  bottom: 0;
+  display: block;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  visibility: hidden;
+  width: 100%;
+  z-index: 100;
+}
+
+.spinner span {
+  display: inline-block;
+  font-size: 2em;
+  margin: 5px;
+
+  -webkit-animation-name: chartloading;
+  -webkit-animation-duration: 0.5s;
+  -webkit-animation-timing-function: linear;
+  -webkit-animation-iteration-count: infinite;
+  
+  animation-name: chartloading;
+  animation-duration: 0.5s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@-webkit-keyframes chartloading {
+  from { -webkit-transform: rotate(0deg); }
+  to { -webkit-transform: rotate(360deg); }
+}
+@keyframes chartloading {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
