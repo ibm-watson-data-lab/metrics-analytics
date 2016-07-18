@@ -127,12 +127,14 @@ var mainApp = angular.module('visualizationApp',
     var minDate = moment().subtract(2, 'year').startOf('year');
     var maxDate = moment().add(1, 'day');
     
-    $('input[name="daterange"]')
-      .val(initStart.format('YYYY-MM-DD') + ' - ' + initEnd.format('YYYY-MM-DD'));
+    var updateInput = function(start, end) {
+      $('input[name="daterange"]')
+        .val(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+    }
     
     $('input[name="daterange"]')
       .daterangepicker({
-        format: 'YYYY-MM-DD',
+        format: 'MM/DD/YYYY',
         startDate: initStart,
         endData: initEnd,
         minDate: minDate,
@@ -153,11 +155,15 @@ var mainApp = angular.module('visualizationApp',
         opens: 'left'
       },
       function(startDate, endDate, label) {
+        updateInput(startDate, endDate);
+
         $scope.$apply(function() {
           $scope.dashboard.startDate = startDate.format('YYYY-MM-DD');
           $scope.dashboard.endDate = endDate.format('YYYY-MM-DD');
         });
       });
+
+    updateInput(initStart, initEnd);      
 
     var siteid = '', visname = null, charttype = null;
     var search = $location.search();

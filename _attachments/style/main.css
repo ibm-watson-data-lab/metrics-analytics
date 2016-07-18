@@ -112,6 +112,14 @@ body {
   color: #264a60;
 }
 
+.daterangepicker .fa-arrow-right::before {
+  content: '\0003E';
+}
+
+.daterangepicker .fa-arrow-left::before {
+  content: '\0003C';
+}
+
 svg {
   font-size: 0.85rem;
   font-weight: 300;

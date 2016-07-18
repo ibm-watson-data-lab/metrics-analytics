@@ -32,7 +32,7 @@ angular.module('visualizationAppService', [])
           }
           return deferred.resolve(allCounts);
         })
-        .display();
+        .render();
 
       return deferred.promise;
     };
@@ -48,12 +48,16 @@ angular.module('visualizationAppService', [])
             .attr('view', 'grouped_geos')
             .attr('param', null)
             .attr('group', true)
+            .attr('tooltip', function(d, i) {
+              return d.value + ' activities across ' + d.geo.length +
+                      ' locations near [' + d.key + ']'; 
+            })
             .on('data', function(data) {
               var keyfunc = function(d) { return [d.key[0].toFixed(0), d.key[1].toFixed(0)]; };
               var rollupfunc = function(l) {
                 return {
                   value: d3.sum(l, function(d) { return d.value; }),
-                  geos: l//.map(function(d) { return d.key })
+                  geo: l.map(function(d) { return d.key })
                 }
               };
 
@@ -70,14 +74,14 @@ angular.module('visualizationAppService', [])
 
               results.forEach(function(d) {
                 d.value = d.values.value;
-                d.geos = d.values.geos;
+                d.geo = d.values.geo;
                 delete d.values;
               });
 
               results.features = topojson.feature(world, world.objects.land);
               return results;
             })
-            .display(selector);
+            .render(selector);
         }
       );
     };
@@ -258,11 +262,15 @@ angular.module('visualizationAppService', [])
         .attr('endkey', endkey)
         .attr('group', true)
         .on('start', function(url) {
-          this.select('.spinner').style('visibility', 'initial');
+          if (this.select) {
+            this.select('.spinner').style('visibility', 'initial');
+          }
         })
         .on('data', function(data) {
           console.log(data);
-          this.select('.spinner').style('visibility', null);
+          if (this.select) {
+            this.select('.spinner').style('visibility', null);
+          }
           return dataMap[opts.visName](data);
         })
         .on('end', function() {
@@ -270,9 +278,11 @@ angular.module('visualizationAppService', [])
         })
         .on('fail', function(err) {
           console.log('fail', err);
-          this.select('.spinner').style('visibility', null);
+          if (this.select) {
+            this.select('.spinner').style('visibility', null);
+          }
         })
-        .display(selector);
+        .render(selector);
     };
 
 
